@@ -1,16 +1,22 @@
 import Head from "next/head"
 import Link from "next/link"
 import { useRouter } from "next/router"
+import { listenerCount } from "process"
 import { useState, useEffect } from "react"
 
 export default function ShowList(props) {
   const router = useRouter()
   const { allLists } = props
+
+  // On first run through this component, only the props.list will exist
+  // from our server side calls. Next will render the component server side
+  // then hydrate and client side
   const [list, setList] = useState(props.list)
 
   useEffect(() => {
-    // useEffect does not run until client side
-    // if (router.query.slug)
+    // useEffect does not run until client side. We'll already have the initial request
+    // loaded for the list but if routing changes, we have to tell react to load the
+    // new list.
     if (router.query.slug !== list.slug) {
       getList(router.query.slug).then(setList)
     }
@@ -19,7 +25,7 @@ export default function ShowList(props) {
   return (
     <div>
       <Head>
-        <title>Next.js + SSR flow example</title>
+        <title>{list.name}</title>
       </Head>
 
       <h1>View List</h1>
